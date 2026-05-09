@@ -1,0 +1,37 @@
+{
+  "name": "mockit-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Backend: HTTP API + MCP shim for programmatic mockups (2D Sharp). Front app lives separately.",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "sync:mockup3d": "cd ../mockup3d && npm run build && rm -rf ../mockit-api/public/mockup3d && cp -r dist ../mockit-api/public/mockup3d",
+    "start": "npm run start:api",
+    "start:api": "node dist/server.js",
+    "start:mcp": "node dist/mcp.js",
+    "mockup:file": "node scripts/post-mockup-from-file.mjs",
+    "dev:api": "tsx watch src/server.ts",
+    "dev:mcp": "tsx src/mcp.ts",
+    "prestart:api": "npm run build",
+    "prestart:mcp": "npm run build"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "express": "^5.2.1",
+    "playwright": "^1.50.0",
+    "sharp": "^0.34.3",
+    "three": "^0.184.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^24.12.2",
+    "tsx": "^4.19.4",
+    "typescript": "~5.8.0"
+  }
+}

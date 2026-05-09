@@ -1,0 +1,136 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1778204655688,
+  "projectRoot": "/Users/bryanriano/Desktop/mockit-api",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": ">=18",
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "express",
+        "version": "5.2.1",
+        "category": "backend"
+      },
+      {
+        "name": "playwright",
+        "version": "1.50.0",
+        "category": "testing"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": "Node.js 18"
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": "npm run start",
+    "scripts": {
+      "build": "tsc -p tsconfig.json",
+      "sync:mockup3d": "cd ../mockup3d && npm run build && rm -rf ../mockit-api/public/mockup3d && cp -r dist ../mockit-api/public/mockup3d",
+      "start": "npm run start:api",
+      "start:api": "node dist/server.js",
+      "start:mcp": "node dist/mcp.js",
+      "mockup:file": "node scripts/post-mockup-from-file.mjs",
+      "dev:api": "tsx watch src/server.ts",
+      "dev:mcp": "tsx src/mcp.ts",
+      "prestart:api": "npm run build",
+      "prestart:mcp": "npm run build"
+    }
+  },
+  "conventions": {
+    "namingStyle": "camelCase",
+    "importStyle": "ES modules",
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "public",
+      "scripts",
+      "src"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "dist": {
+      "path": "dist",
+      "purpose": "Distribution/build output",
+      "fileCount": 2,
+      "lastAccessed": 1778204655653,
+      "keyFiles": [
+        "mcp.js",
+        "server.js"
+      ]
+    },
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 0,
+      "lastAccessed": 1778204655653,
+      "keyFiles": []
+    },
+    "scripts": {
+      "path": "scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 1,
+      "lastAccessed": 1778204655660,
+      "keyFiles": [
+        "post-mockup-from-file.mjs"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 2,
+      "lastAccessed": 1778204655661,
+      "keyFiles": [
+        "mcp.ts",
+        "server.ts"
+      ]
+    },
+    "dist/lib": {
+      "path": "dist/lib",
+      "purpose": "Library code",
+      "fileCount": 6,
+      "lastAccessed": 1778204655662,
+      "keyFiles": [
+        "decode-base64.js",
+        "render-phone-3d.js",
+        "render-phone.js"
+      ]
+    },
+    "src/lib": {
+      "path": "src/lib",
+      "purpose": "Library code",
+      "fileCount": 6,
+      "lastAccessed": 1778204655665,
+      "keyFiles": [
+        "decode-base64.ts",
+        "render-phone-3d.ts",
+        "render-phone.ts"
+      ]
+    }
+  },
+  "hotPaths": [],
+  "userDirectives": []
+}
