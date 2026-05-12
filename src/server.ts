@@ -19,6 +19,10 @@ app.use('/mockup3d', express.static(
   path.join(__dirname, '../public/mockup3d'),
   { maxAge: '1d' }
 ))
+app.use('/models', express.static(
+  path.join(__dirname, '../public/mockup3d/models'),
+  { maxAge: '1d' }
+))
 
 // ── Health ────────────────────────────────────────────────────────────────
 app.get('/health', (_req, res) => {
