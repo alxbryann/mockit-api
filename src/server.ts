@@ -47,11 +47,24 @@ app.post('/v1/mockups/phone', async (req, res) => {
   }
 
   try {
-    const screenshotBuffer = decodeBase64Image(parsed.data.image_base64)
-    const { device_rotation } = parsed.data
+    const { device_rotation, devices } = parsed.data
+
+    const devicesPayload = devices?.map((d) => ({
+      kind: d.kind,
+      screenshotBuffer: decodeBase64Image(d.image_base64),
+      deviceColorHex: d.device_color_hex,
+      deviceRotation: d.device_rotation,
+      positionX: d.position_x,
+      positionY: d.position_y,
+    }))
+
+    if (!devicesPayload && !parsed.data.image_base64) {
+      res.status(422).type('application/json').send(JSON.stringify({ error: 'Provide either `image_base64` or a `devices` array.' }))
+      return
+    }
 
     const png = await renderPhone3D({
-      screenshotBuffer,
+      screenshotBuffer: parsed.data.image_base64 ? decodeBase64Image(parsed.data.image_base64) : undefined,
       canvasWidth: parsed.data.canvas_width,
       canvasHeight: parsed.data.canvas_height,
       deviceColorHex: parsed.data.device_color_hex,
@@ -60,6 +73,9 @@ app.post('/v1/mockups/phone', async (req, res) => {
       zoom: parsed.data.zoom,
       cameraOffsetX: parsed.data.camera_offset_x,
       cameraOffsetY: parsed.data.camera_offset_y,
+      cameraRoll: parsed.data.camera_roll,
+      transparent: parsed.data.transparent,
+      devices: devicesPayload,
     })
 
     const filename = `mockit-${Date.now()}.png`

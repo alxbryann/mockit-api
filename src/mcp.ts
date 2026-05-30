@@ -34,8 +34,20 @@ function parsePhoneArgs(raw: unknown) {
 
   const b64 = first.data.image_base64
   const pth = first.data.image_path
-  if ((b64 && pth) || (!b64 && !pth)) {
-    return { ok: false as const, error: 'Provide exactly one of image_base64 or image_path' }
+  const devices = first.data.devices
+
+  if (!devices || devices.length === 0) {
+    if ((b64 && pth) || (!b64 && !pth)) {
+      return { ok: false as const, error: 'Provide exactly one of image_base64 or image_path (or a non-empty `devices` array)' }
+    }
+  } else {
+    for (const [i, d] of devices.entries()) {
+      const has64 = !!d.image_base64
+      const hasPath = !!d.image_path
+      if ((has64 && hasPath) || (!has64 && !hasPath)) {
+        return { ok: false as const, error: `devices[${i}]: provide exactly one of image_base64 or image_path` }
+      }
+    }
   }
 
   return {
@@ -43,15 +55,19 @@ function parsePhoneArgs(raw: unknown) {
     value: {
       image_base64: b64,
       image_path: pth,
-      canvas_width: first.data.canvas_width ?? 1440,
-      canvas_height: first.data.canvas_height ?? 2880,
+      // MCP defaults to HQ (2x the HTTP defaults) — MSAA 8 + DPR 2 + this resolution = best output the renderer can produce.
+      canvas_width: first.data.canvas_width ?? 2880,
+      canvas_height: first.data.canvas_height ?? 5760,
       device_color_hex: first.data.device_color_hex ?? '#c0b9ad',
       background_hex: first.data.background_hex ?? '#0a0a0a',
       device_rotation: first.data.device_rotation,
       zoom: first.data.zoom,
       camera_offset_x: first.data.camera_offset_x,
       camera_offset_y: first.data.camera_offset_y,
+      camera_roll: first.data.camera_roll,
+      transparent: first.data.transparent ?? false,
       output_basename: first.data.output_basename,
+      devices,
     },
   }
 }
@@ -85,11 +101,28 @@ server.registerTool(
     }
 
     try {
-      const image_base64 = await screenshotAsBase64ForApi(parsed.value)
+      const devicesForBody = parsed.value.devices
+        ? await Promise.all(
+            parsed.value.devices.map(async (d) => ({
+              kind: (d.kind ?? 'phone') as 'phone' | 'mac',
+              image_base64: await screenshotAsBase64ForApi({ image_base64: d.image_base64, image_path: d.image_path }),
+              device_color_hex: d.device_color_hex,
+              device_rotation: d.device_rotation,
+              position_x: d.position_x,
+              position_y: d.position_y,
+            })),
+          )
+        : undefined
+
+      const topLevelImage =
+        !devicesForBody && (parsed.value.image_base64 || parsed.value.image_path)
+          ? await screenshotAsBase64ForApi(parsed.value)
+          : undefined
+
       const png = await fetchPhoneMockupPng(
         apiUrl(),
         {
-          image_base64,
+          ...(topLevelImage ? { image_base64: topLevelImage } : {}),
           canvas_width: parsed.value.canvas_width,
           canvas_height: parsed.value.canvas_height,
           device_color_hex: parsed.value.device_color_hex,
@@ -98,6 +131,9 @@ server.registerTool(
           zoom: parsed.value.zoom ?? DEFAULT_MCP_PHONE_ZOOM,
           camera_offset_x: parsed.value.camera_offset_x ?? 0,
           camera_offset_y: parsed.value.camera_offset_y ?? 0,
+          ...(typeof parsed.value.camera_roll === 'number' ? { camera_roll: parsed.value.camera_roll } : {}),
+          transparent: parsed.value.transparent,
+          ...(devicesForBody ? { devices: devicesForBody } : {}),
         },
         apiKey(),
       )

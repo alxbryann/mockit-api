@@ -6,7 +6,7 @@
   "description": "Backend: HTTP API + MCP shim for programmatic mockups (2D Sharp). Front app lives separately.",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "sync:mockup3d": "cd ../mockup3d && npm run build && rm -rf ../mockit-api/public/mockup3d && cp -r dist ../mockit-api/public/mockup3d",
+    "sync:mockup3d": "cd ../openmockup.ai && npm run build && rm -rf ../mockit-api/public/mockup3d && cp -r dist ../mockit-api/public/mockup3d",
     "start": "npm run start:api",
     "start:api": "node dist/server.js",
     "start:mcp": "node dist/mcp.js",
